@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gestión de Parqueadero - Parking Management System</title>
+    <link rel="stylesheet" href="src/styles/main.css">
+    <link rel="stylesheet" href="src/styles/zones.css">
+    <link rel="stylesheet" href="src/styles/spaces.css">
+    <link rel="stylesheet" href="src/styles/responsive.css">
+</head>
+<body>
+    <div id="root">
+        <header class="header">
+            <div class="container">
+                <div class="header-content">
+                    <h1 class="logo">🅿️ ParkingHub</h1>
+                    <nav class="nav">
+                        <ul>
+                            <li><a href="#" data-section="dashboard" class="nav-link active">Dashboard</a></li>
+                            <li><a href="#" data-section="zones" class="nav-link">Zonas</a></li>
+                            <li><a href="#" data-section="spaces" class="nav-link">Espacios</a></li>
+                            <li><a href="#" data-section="analytics" class="nav-link">Análisis</a></li>
+                        </ul>
+                    </nav>
+                    <div class="status-indicator">
+                        <span class="status-dot online"></span>
+                        <span class="status-text">Sistema Conectado</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div class="container">
+                <!-- DASHBOARD SECTION -->
+                <section id="dashboard-section" class="section active">
+                    <div class="section-header">
+                        <h2>Dashboard</h2>
+                        <p>Visualización general del sistema de parqueadero</p>
+                    </div>
+
+                    <div class="dashboard-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">📊</div>
+                            <div class="stat-content">
+                                <div class="stat-value" id="total-zones">0</div>
+                                <div class="stat-label">Zonas Totales</div>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-icon">🅿️</div>
+                            <div class="stat-content">
+                                <div class="stat-value" id="total-spaces">0</div>
+                                <div class="stat-label">Espacios Totales</div>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-icon">✅</div>
+                            <div class="stat-content">
+                                <div class="stat-value" id="available-spaces">0</div>
+                                <div class="stat-label">Espacios Disponibles</div>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-icon">🔴</div>
+                            <div class="stat-content">
+                                <div class="stat-value" id="occupied-spaces">0</div>
+                                <div class="stat-label">Espacios Ocupados</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-sections">
+                        <div class="dashboard-section">
+                            <h3>Zonas Registradas</h3>
+                            <div id="zones-list-dashboard" class="zones-list-container">
+                                <div class="loading">Cargando zonas...</div>
+                            </div>
+                        </div>
+
+                        <div class="dashboard-section">
+                            <h3>Últimos Cambios</h3>
+                            <div id="recent-activity" class="activity-feed">
+                                <div class="no-activity">No hay actividad reciente</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ZONES SECTION -->
+                <section id="zones-section" class="section">
+                    <div class="section-header">
+                        <h2>Gestión de Zonas</h2>
+                        <p>Crear, actualizar y eliminar zonas del parqueadero</p>
+                    </div>
+
+                    <div class="section-controls">
+                        <button id="btn-new-zone" class="btn btn-primary">➕ Nueva Zona</button>
+                        <div class="search-box">
+                            <input type="text" id="zone-search" placeholder="Buscar zona...">
+                        </div>
+                    </div>
+
+                    <div id="zones-grid" class="zones-grid">
+                        <div class="loading">Cargando zonas...</div>
+                    </div>
+
+                    <!-- Modal para crear/editar zona -->
+                    <div id="zone-modal" class="modal hidden">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h3 id="zone-modal-title">Nueva Zona</h3>
+                                <button class="btn-close">&times;</button>
+                            </div>
+                            <form id="zone-form" class="form">
+                                <div class="form-group">
+                                    <label for="zone-name">Nombre</label>
+                                    <input type="text" id="zone-name" required placeholder="Ej: Zona A">
+                                </div>
+                                <div class="form-group">
+                                    <label for="zone-description">Descripción</label>
+                                    <textarea id="zone-description" placeholder="Descripción de la zona"></textarea>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="zone-capacity">Capacidad</label>
+                                        <input type="number" id="zone-capacity" required min="5" max="25" placeholder="Ej: 10">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="zone-type">Tipo</label>
+                                        <select id="zone-type" required>
+                                            <option value="">Seleccionar tipo</option>
+                                            <option value="COVERED">Cubierta</option>
+                                            <option value="UNCOVERED">Descubierta</option>
+                                            <option value="PREMIUM">Premium</option>
+                                            <option value="VALET">Valet</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group checkbox">
+                                    <input type="checkbox" id="zone-active" checked>
+                                    <label for="zone-active">Activa</label>
+                                </div>
+                                <div class="form-actions">
+                                    <button type="submit" class="btn btn-primary">Guardar</button>
+                                    <button type="button" class="btn btn-secondary" data-action="cancel">Cancelar</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SPACES SECTION -->
+                <section id="spaces-section" class="section">
+                    <div class="section-header">
+                        <h2>Gestión de Espacios</h2>
+                        <p>Administrar espacios de parqueadero y sus estados</p>
+                    </div>
+
+                    <div class="section-controls">
+                        <button id="btn-new-space" class="btn btn-primary">➕ Nuevo Espacio</button>
+                        <select id="filter-by-zone" class="filter-select">
+                            <option value="">Todas las zonas</option>
+                        </select>
+                        <select id="filter-by-status" class="filter-select">
+                            <option value="">Todos los estados</option>
+                            <option value="AVAILABLE">Disponible</option>
+                            <option value="OCCUPIED">Ocupado</option>
+                            <option value="MAINTENANCE">Mantenimiento</option>
+                        </select>
+                    </div>
+
+                    <div id="spaces-grid" class="spaces-grid">
+                        <div class="loading">Cargando espacios...</div>
+                    </div>
+
+                    <!-- Modal para crear/editar espacio -->
+                    <div id="space-modal" class="modal hidden">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h3 id="space-modal-title">Nuevo Espacio</h3>
+                                <button class="btn-close">&times;</button>
+                            </div>
+                            <form id="space-form" class="form">
+                                <div class="form-group">
+                                    <label for="space-codigo">Código</label>
+                                    <input type="text" id="space-codigo" required placeholder="Ej: A-001">
+                                </div>
+                                <div class="form-group">
+                                    <label for="space-zone">Zona</label>
+                                    <select id="space-zone" required></select>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="space-status">Estado</label>
+                                        <select id="space-status" required>
+                                            <option value="AVAILABLE">Disponible</option>
+                                            <option value="OCCUPIED">Ocupado</option>
+                                            <option value="MAINTENANCE">Mantenimiento</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="space-priority">Prioridad</label>
+                                        <input type="number" id="space-priority" min="1" max="10" value="5">
+                                    </div>
+                                </div>
+                                <div class="form-group checkbox">
+                                    <input type="checkbox" id="space-reserved">
+                                    <label for="space-reserved">Reservado</label>
+                                </div>
+                                <div class="form-actions">
+                                    <button type="submit" class="btn btn-primary">Guardar</button>
+                                    <button type="button" class="btn btn-secondary" data-action="cancel">Cancelar</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ANALYTICS SECTION -->
+                <section id="analytics-section" class="section">
+                    <div class="section-header">
+                        <h2>Análisis y Reportes</h2>
+                        <p>Visualización de estadísticas del sistema</p>
+                    </div>
+
+                    <div class="analytics-grid">
+                        <div class="analytics-card">
+                            <h3>Ocupación por Zona</h3>
+                            <div id="occupancy-chart" class="chart-placeholder">
+                                <div class="loading">Cargando datos...</div>
+                            </div>
+                        </div>
+
+                        <div class="analytics-card">
+                            <h3>Distribución de Estados</h3>
+                            <div id="status-chart" class="chart-placeholder">
+                                <div class="loading">Cargando datos...</div>
+                            </div>
+                        </div>
+
+                        <div class="analytics-card full-width">
+                            <h3>Espacios por Zona</h3>
+                            <table class="analytics-table">
+                                <thead>
+                                    <tr>
+                                        <th>Zona</th>
+                                        <th>Disponibles</th>
+                                        <th>Ocupados</th>
+                                        <th>Mantenimiento</th>
+                                        <th>Total</th>
+                                        <th>Ocupación %</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="analytics-table-body">
+                                    <tr><td colspan="6" class="loading">Cargando datos...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <div class="container">
+                <p>&copy; 2025 ParkingHub | Sistema de Gestión de Parqueadero Distribuido</p>
+                <p>Backend: Spring Boot 3.5.7 | RabbitMQ | PostgreSQL</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Notificaciones -->
+    <div id="notification-container" class="notification-container"></div>
+
+    <!-- Scripts -->
+    <script src="src/js/services/api.js"></script>
+    <script src="src/js/components/zones.js"></script>
+    <script src="src/js/components/spaces.js"></script>
+    <script src="src/js/components/dashboard.js"></script>
+    <script src="src/js/components/analytics.js"></script>
+    <script src="src/js/app.js"></script>
+</body>
+</html>
