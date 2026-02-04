@@ -12,7 +12,6 @@ import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.sql.Update;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,12 +22,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class SpacesServicesImpl implements SpacesService {
 
-        @Autowired
-        private NotificactionProducer notificactionProducer;
-
-        // inyeccion de dependencias con autowired
-        @Autowired
-        private SpacesRepository spacesRepository;
+        private final NotificactionProducer notificactionProducer;
+        private final SpacesRepository spacesRepository;
         private final ZoneRepository zoneRepository;
         // inyección de dependencias utilizando constructores vacios
         /*

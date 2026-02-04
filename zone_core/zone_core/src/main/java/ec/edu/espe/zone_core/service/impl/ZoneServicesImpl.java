@@ -9,7 +9,6 @@ import ec.edu.espe.zone_core.repository.SpacesRepository;
 import ec.edu.espe.zone_core.repository.ZoneRepository;
 import ec.edu.espe.zone_core.service.ZoneServices;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,18 +16,12 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class ZoneServicesImpl implements ZoneServices {
 
-    @Autowired
-    private NotificactionProducer notificactionProducer;
-
+    private final NotificactionProducer notificactionProducer;
     private final ZoneRepository zoneRepository;
     private final SpacesRepository spacesRepository;
-
-    public ZoneServicesImpl(ZoneRepository zoneRepository, SpacesRepository spacesRepository) {
-        this.zoneRepository = zoneRepository;
-        this.spacesRepository = spacesRepository;
-    }
 
     @Override
     public ZoneResponseDto createZone(ZoneRequestDto dto) {
