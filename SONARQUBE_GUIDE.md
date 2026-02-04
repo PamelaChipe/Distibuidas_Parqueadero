@@ -62,7 +62,41 @@ Abre tu navegador en `http://localhost:9000` con credenciales:
 
 ## Ejecutar Análisis de Código
 
-### Análisis Backend (Java)
+### Requisitos Previos
+
+**Importante**: SonarQube debe estar ejecutándose antes de iniciar el análisis.
+
+Verifica que SonarQube esté accesible:
+```bash
+curl http://localhost:9000
+```
+
+Si no está ejecutándose, inicia el servidor con Docker:
+```bash
+docker run -d --name sonarqube -p 9000:9000 sonarqube:latest
+```
+
+### Opción 1: Usar Script Automatizado (Recomendado)
+
+El proyecto incluye scripts que ejecutan SonarQube automáticamente:
+
+**En Linux/Mac:**
+```bash
+./run-sonarqube.sh
+```
+
+**En Windows:**
+```bash
+run-sonarqube.bat
+```
+
+Estos scripts:
+- Verifican que SonarQube esté ejecutándose
+- Ejecutan todas las pruebas
+- Realizan el análisis de código
+- Muestran el URL del dashboard
+
+### Opción 2: Análisis Manual Backend (Java)
 
 Navega al directorio del backend:
 
@@ -73,15 +107,14 @@ cd zone_core/zone_core
 Ejecuta el análisis con Maven:
 
 ```bash
-mvn clean verify sonar:sonar \
+mvn clean test sonar:sonar \
   -Dsonar.projectKey=Distibuidas_Parqueadero \
+  -Dsonar.projectName="Sistema Gestión Parqueadero" \
   -Dsonar.host.url=http://localhost:9000 \
-  -Dsonar.login=TU_TOKEN_AQUI
+  -Dsonar.login=admin
 ```
 
-Reemplaza `TU_TOKEN_AQUI` con el token que generaste.
-
-### Versión Simplificada
+### Opción 3: Análisis Simplificado
 
 Si configuraste el pom.xml correctamente:
 
@@ -153,19 +186,56 @@ El dashboard principal muestra:
 
 ## Problemas Comunes y Soluciones
 
-### Problema 1: No se Conecta a SonarQube
+### Problema 1: SonarQube No Está Ejecutándose
 
 **Error:**
 ```
 SonarQube server [http://localhost:9000] can not be reached
 ```
 
-**Solución:**
-1. Verifica que SonarQube esté ejecutándose: `http://localhost:9000`
-2. Verifica la dirección IP si no estás en localhost
-3. Comprueba el firewall
+**Solución Rápida - Inicia SonarQube con Docker:**
+```bash
+docker run -d --name sonarqube -p 9000:9000 sonarqube:latest
+```
 
-### Problema 2: Token Inválido
+Espera 30-60 segundos para que SonarQube inicie completamente.
+
+Luego ejecuta el análisis:
+```bash
+# Linux/Mac
+./run-sonarqube.sh
+
+# Windows
+run-sonarqube.bat
+```
+
+**Solución Manual:**
+1. Verifica que SonarQube esté ejecutándose: `http://localhost:9000`
+2. Si no está instalado, descargar desde: https://www.sonarqube.org/downloads/
+3. Inicia el servidor desde tu instalación
+4. Espera a que esté completamente iniciado
+
+### Problema 2: Connection Refused
+
+**Error:**
+```
+Connection refused connecting to http://localhost:9000
+```
+
+**Solución:**
+```bash
+# Verifica si SonarQube está corriendo
+curl http://localhost:9000
+
+# Si no responde, inicia con Docker
+docker run -d --name sonarqube -p 9000:9000 sonarqube:latest
+
+# Espera y verifica de nuevo
+sleep 30
+curl http://localhost:9000
+```
+
+### Problema 3: Credenciales Inválidas
 
 **Error:**
 ```
@@ -173,21 +243,51 @@ Authentication failed
 ```
 
 **Solución:**
-1. Verifica que el token sea correcto
-2. Genera un nuevo token si expira
-3. Asegúrate de usar `sonar.login` correctamente
+- Usuario por defecto: `admin`
+- Contraseña por defecto: `admin`
 
-### Problema 3: Análisis No Completa
+Si las credenciales son incorrectas:
+1. Accede a `http://localhost:9000`
+2. Haz clic en "Log in"
+3. Usa admin/admin
+4. Si no funciona, resetea la base de datos de SonarQube
+
+### Problema 4: Maven No Encuentra Dependencias
 
 **Error:**
 ```
-Compilation errors
+[ERROR] Failed to execute goal org.sonarsource.scanner.maven:sonar-maven-plugin
 ```
 
 **Solución:**
-1. Ejecuta primero: `mvn clean install`
-2. Verifica que todas las dependencias estén descargadas
-3. Comprueba que no hay errores de compilación
+```bash
+# Limpia el repositorio de Maven
+mvn clean
+rm -rf ~/.m2/repository
+
+# Descarga nuevamente las dependencias
+mvn install
+```
+
+### Problema 5: JaCoCo No Genera Reporte
+
+**Error:**
+```
+Skipping JaCoCo execution due to missing execution data file
+```
+
+**Solución:**
+1. Asegúrate de que las pruebas se ejecuten:
+```bash
+mvn clean test
+```
+
+2. Verifica que el archivo jacoco.exec se cree:
+```bash
+ls -la target/jacoco.exec
+```
+
+3. Si el archivo no existe, verifica que JaCoCo esté configurado correctamente en pom.xml
 
 ---
 
