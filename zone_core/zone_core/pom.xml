@@ -28,6 +28,11 @@
 	</scm>
 	<properties>
 		<java.version>21</java.version>
+		<sonar.projectKey>Distibuidas_Parqueadero</sonar.projectKey>
+		<sonar.projectName>Sistema Gestión Parqueadero</sonar.projectName>
+		<sonar.host.url>http://localhost:9000</sonar.host.url>
+		<sonar.login>admin</sonar.login>
+		<jacoco.maven.plugin.version>0.8.11</jacoco.maven.plugin.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -168,6 +173,12 @@
 						<include>**/*Tests.java</include>
 					</includes>
 				</configuration>
+			</plugin>
+			<!-- SonarQube Maven Plugin for Code Quality Analysis -->
+			<plugin>
+				<groupId>org.sonarsource.scanner.maven</groupId>
+				<artifactId>sonar-maven-plugin</artifactId>
+				<version>4.0.0.4121</version>
 			</plugin>
 		</plugins>
 	</build>
