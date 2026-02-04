@@ -99,6 +99,14 @@ const ZonesComponent = {
             ? '<span class="material-icons icon-inline">check_circle</span>Activa'
             : '<span class="material-icons icon-inline">cancel</span>Inactiva';
         const typeClass = `zone-type-${zone.type?.toLowerCase() || 'standard'}`;
+        const totalCapacity = zone.capacity ?? 0;
+        const availableCapacity = zone.availableCapacity ?? totalCapacity;
+        const availabilityRatio = totalCapacity > 0 ? (availableCapacity / totalCapacity) : 0;
+        const availabilityBadgeClass = availabilityRatio >= 0.6
+            ? 'bg-success'
+            : availabilityRatio >= 0.3
+                ? 'bg-warning text-dark'
+                : 'bg-danger';
 
         return `
             <div class="zone-card card shadow-sm">
@@ -106,6 +114,7 @@ const ZonesComponent = {
                     <div class="zone-title">
                         <h3 class="zone-name">${zone.name}</h3>
                         <span class="badge bg-info zone-type-badge ${typeClass}">${zone.type || 'N/A'}</span>
+                        <span class="badge availability-badge ${availabilityBadgeClass}">${availableCapacity} / ${totalCapacity} disponibles</span>
                     </div>
                     <div class="zone-actions">
                         <button class="btn btn-outline-primary btn-sm" data-action="edit" data-id="${zone.id}"><span class="material-icons">edit</span></button>
@@ -117,8 +126,8 @@ const ZonesComponent = {
 
                 <div class="zone-stats">
                     <div class="zone-stat">
-                        <div class="zone-stat-value">${zone.capacity}</div>
-                        <div class="zone-stat-label">Capacidad</div>
+                        <div class="zone-stat-value">${zone.availableCapacity ?? zone.capacity}</div>
+                        <div class="zone-stat-label">Disponibles</div>
                     </div>
                     <div class="zone-stat">
                         <div class="zone-stat-value">0</div>
@@ -301,7 +310,7 @@ const ZonesComponent = {
                 <div class="zone-list-icon"><span class="material-icons">local_parking</span></div>
                 <div class="zone-list-content">
                     <h4 class="zone-list-name">${zone.name}</h4>
-                    <p class="zone-list-info">Capacidad: ${zone.capacity} espacios</p>
+                    <p class="zone-list-info">Disponibles: ${zone.availableCapacity ?? zone.capacity} / Total: ${zone.capacity}</p>
                 </div>
                 <div class="zone-list-status">
                     ${zone.isActive
@@ -313,7 +322,10 @@ const ZonesComponent = {
     }
 };
 
-// Inicializar cuando el DOM esté listo
+// Inicializar cuando el DOM esté listo (solo si estamos en la página de zonas)
 document.addEventListener('DOMContentLoaded', () => {
-    ZonesComponent.init();
+    // Solo inicializar si el elemento zones-grid existe (página de zonas.html)
+    if (document.getElementById('zones-grid')) {
+        ZonesComponent.init();
+    }
 });

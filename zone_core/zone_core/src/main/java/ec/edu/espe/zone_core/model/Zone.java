@@ -28,6 +28,9 @@ public class Zone {
     @Column(nullable = false, name = "capacidad")
     private Integer capacity;
 
+    @Column(name = "capacidad_disponible")
+    private Integer availableCapacity;
+
     @Column(name = "estado")
     private Boolean isActive;
 

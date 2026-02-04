@@ -9,7 +9,6 @@ import lombok.Data;
 
 import java.util.UUID;
 
-
 @Data
 @Builder
 public class ZoneResponseDto {
@@ -25,8 +24,9 @@ public class ZoneResponseDto {
     @Max(value = 25, message = "Capacity must not exceed 25")
     private Integer capacity;
 
+    private Integer availableCapacity;
+
     private ZoneType type;
 
     private Boolean isActive;
 }
-

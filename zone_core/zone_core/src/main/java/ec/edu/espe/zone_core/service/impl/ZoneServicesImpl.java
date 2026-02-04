@@ -36,6 +36,7 @@ public class ZoneServicesImpl implements ZoneServices {
                 .name(dto.getName())
                 .description(dto.getDescription())
                 .capacity(dto.getCapacity())
+                .availableCapacity(dto.getCapacity())
                 .isActive(dto.getIsActive())
                 .type(dto.getType())
                 .build();
@@ -56,6 +57,8 @@ public class ZoneServicesImpl implements ZoneServices {
         zone.setCapacity(dto.getCapacity());
         zone.setIsActive(dto.getIsActive());
         zone.setType(dto.getType());
+
+        zone.setAvailableCapacity(calculateAvailableCapacity(zone, dto.getCapacity()));
 
         Zone updated = zoneRepository.save(zone);
         notificactionProducer.sendZoneUpdated(updated.getId(), updated.getName());
@@ -90,8 +93,18 @@ public class ZoneServicesImpl implements ZoneServices {
                 .name(objSpace.getName())
                 .description(objSpace.getDescription())
                 .capacity(objSpace.getCapacity())
+                .availableCapacity(objSpace.getAvailableCapacity())
                 .isActive(objSpace.getIsActive())
                 .type(objSpace.getType())
                 .build();
+    }
+
+    private Integer calculateAvailableCapacity(Zone zone, Integer newCapacity) {
+        int capacityValue = newCapacity != null ? newCapacity : 0;
+        long blocked = spacesRepository.findByZoneId(zone.getId()).stream()
+                .filter(space -> space.isReserved()
+                        || space.getStatus() == ec.edu.espe.zone_core.model.SpaceStatus.OCCUPIED)
+                .count();
+        return Math.max(0, capacityValue - (int) blocked);
     }
 }

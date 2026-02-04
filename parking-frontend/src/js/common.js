@@ -42,26 +42,16 @@ function setConnectionStatus(isOnline) {
 }
 
 async function checkConnectionStatus() {
-    if (!window.API_BASE_URL) return;
     try {
-        const baseUrl = window.API_BASE_URL.replace(/\/api\/?$/, '');
-        const healthResponse = await fetch(`${baseUrl}/actuator/health`, {
+        // Intentar acceder directamente a un endpoint que sabemos que existe
+        const response = await fetch('http://localhost:8090/api/zones', {
             method: 'GET',
             headers: { 'Accept': 'application/json' },
             cache: 'no-store'
         });
-        if (healthResponse.ok) {
-            setConnectionStatus(true);
-            return;
-        }
-
-        const fallbackResponse = await fetch(`${window.API_BASE_URL}/zones`, {
-            method: 'GET',
-            headers: { 'Accept': 'application/json' },
-            cache: 'no-store'
-        });
-        setConnectionStatus(fallbackResponse.ok);
+        setConnectionStatus(response.ok);
     } catch (error) {
+        console.error('Error checking connection:', error);
         setConnectionStatus(false);
     }
 }

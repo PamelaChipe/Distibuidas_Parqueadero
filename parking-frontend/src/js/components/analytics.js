@@ -4,6 +4,9 @@
  */
 
 const AnalyticsComponent = {
+    zones: [],
+    spaces: [],
+
     /**
      * Inicializar el componente
      */
@@ -30,10 +33,19 @@ const AnalyticsComponent = {
     /**
      * Cargar datos de analytics
      */
-    loadAnalytics() {
-        this.generateOccupancyChart();
-        this.generateStatusChart();
-        this.generateAnalyticsTable();
+    async loadAnalytics() {
+        try {
+            // Cargar zonas y espacios
+            this.zones = await API.zones.getAllZones();
+            this.spaces = await API.spaces.getAllSpaces();
+
+            this.generateOccupancyChart();
+            this.generateStatusChart();
+            this.generateAnalyticsTable();
+        } catch (error) {
+            console.error('Error cargando datos para analytics:', error);
+            showNotification('Error al cargar el análisis', 'error');
+        }
     },
 
     /**
@@ -41,34 +53,44 @@ const AnalyticsComponent = {
      */
     generateOccupancyChart() {
         const container = document.getElementById('occupancy-chart');
-        if (!container || !ZonesComponent.zones) return;
+        if (!container || !this.zones || this.zones.length === 0) {
+            if (container) {
+                container.innerHTML = '<p class="text-muted">No hay datos disponibles</p>';
+            }
+            return;
+        }
 
-        const zoneStats = ZonesComponent.zones.map(zone => {
-            const spaceInZone = SpacesComponent.spaces.filter(s => s.idZone === zone.id);
-            const occupied = spaceInZone.filter(s => s.status === 'OCCUPIED').length;
-            const total = spaceInZone.length || 1;
-            const percentage = Math.round((occupied / total) * 100);
-            return { name: zone.name, occupied, total, percentage };
-        });
+        try {
+            const zoneStats = this.zones.map(zone => {
+                const spaceInZone = this.spaces.filter(s => s.idZone === zone.id);
+                const occupied = spaceInZone.filter(s => s.status === 'OCCUPIED').length;
+                const total = zone.capacity ?? (spaceInZone.length || 1);
+                const percentage = Math.round((occupied / total) * 100);
+                return { name: zone.name, occupied, total, percentage };
+            });
 
-        const chartHTML = `
-            <div class="chart-content">
-                ${zoneStats.length > 0 ? zoneStats.map(stat => `
-                    <div class="chart-item">
-                        <div class="chart-label">
-                            <strong>${stat.name}</strong>
-                            <span>${stat.occupied}/${stat.total}</span>
+            const chartHTML = `
+                <div class="chart-content">
+                    ${zoneStats.length > 0 ? zoneStats.map(stat => `
+                        <div class="chart-item">
+                            <div class="chart-label">
+                                <strong>${stat.name}</strong>
+                                <span>${stat.occupied}/${stat.total}</span>
+                            </div>
+                            <div class="chart-bar">
+                                <div class="chart-bar-fill" style="width: ${stat.percentage}%;"></div>
+                            </div>
+                            <div class="chart-value">${stat.percentage}%</div>
                         </div>
-                        <div class="chart-bar">
-                            <div class="chart-bar-fill" style="width: ${stat.percentage}%;"></div>
-                        </div>
-                        <div class="chart-value">${stat.percentage}%</div>
-                    </div>
-                `).join('') : '<p class="text-muted">No hay datos disponibles</p>'}
-            </div>
-        `;
+                    `).join('') : '<p class="text-muted">No hay datos disponibles</p>'}
+                </div>
+            `;
 
-        container.innerHTML = chartHTML;
+            container.innerHTML = chartHTML;
+        } catch (error) {
+            console.error('Error generando gráfico de ocupación:', error);
+            container.innerHTML = '<p class="text-danger">Error al cargar el gráfico</p>';
+        }
     },
 
     /**
@@ -76,53 +98,63 @@ const AnalyticsComponent = {
      */
     generateStatusChart() {
         const container = document.getElementById('status-chart');
-        if (!container || !SpacesComponent.spaces) return;
+        if (!container || !this.spaces || this.spaces.length === 0) {
+            if (container) {
+                container.innerHTML = '<p class="text-muted">No hay datos disponibles</p>';
+            }
+            return;
+        }
 
-        const available = SpacesComponent.spaces.filter(s => s.status === 'AVAILABLE').length;
-        const occupied = SpacesComponent.spaces.filter(s => s.status === 'OCCUPIED').length;
-        const maintenance = SpacesComponent.spaces.filter(s => s.status === 'MAINTENANCE').length;
-        const total = SpacesComponent.spaces.length || 1;
+        try {
+            const available = this.spaces.filter(s => s.status === 'AVAILABLE').length;
+            const occupied = this.spaces.filter(s => s.status === 'OCCUPIED').length;
+            const maintenance = this.spaces.filter(s => s.status === 'MAINTENANCE').length;
+            const total = this.spaces.length || 1;
 
-        const availablePercent = Math.round((available / total) * 100);
-        const occupiedPercent = Math.round((occupied / total) * 100);
-        const maintenancePercent = Math.round((maintenance / total) * 100);
+            const availablePercent = Math.round((available / total) * 100);
+            const occupiedPercent = Math.round((occupied / total) * 100);
+            const maintenancePercent = Math.round((maintenance / total) * 100);
 
-        const chartHTML = `
-            <div class="chart-content">
-                <div class="chart-item">
-                    <div class="chart-label">
-                        <strong><span class="material-icons icon-inline">check_circle</span>Disponibles</strong>
-                        <span>${available}</span>
+            const chartHTML = `
+                <div class="chart-content">
+                    <div class="chart-item">
+                        <div class="chart-label">
+                            <strong><span class="material-icons icon-inline">check_circle</span>Disponibles</strong>
+                            <span>${available}</span>
+                        </div>
+                        <div class="chart-bar">
+                            <div class="chart-bar-fill success-fill" style="width: ${availablePercent}%;"></div>
+                        </div>
+                        <div class="chart-value">${availablePercent}%</div>
                     </div>
-                    <div class="chart-bar">
-                        <div class="chart-bar-fill success-fill" style="width: ${availablePercent}%;"></div>
+                    <div class="chart-item">
+                        <div class="chart-label">
+                            <strong><span class="material-icons icon-inline">cancel</span>Ocupados</strong>
+                            <span>${occupied}</span>
+                        </div>
+                        <div class="chart-bar">
+                            <div class="chart-bar-fill danger-fill" style="width: ${occupiedPercent}%;"></div>
+                        </div>
+                        <div class="chart-value">${occupiedPercent}%</div>
                     </div>
-                    <div class="chart-value">${availablePercent}%</div>
+                    <div class="chart-item">
+                        <div class="chart-label">
+                            <strong><span class="material-icons icon-inline">build</span>Mantenimiento</strong>
+                            <span>${maintenance}</span>
+                        </div>
+                        <div class="chart-bar">
+                            <div class="chart-bar-fill warning-fill" style="width: ${maintenancePercent}%;"></div>
+                        </div>
+                        <div class="chart-value">${maintenancePercent}%</div>
+                    </div>
                 </div>
-                <div class="chart-item">
-                    <div class="chart-label">
-                        <strong><span class="material-icons icon-inline">cancel</span>Ocupados</strong>
-                        <span>${occupied}</span>
-                    </div>
-                    <div class="chart-bar">
-                        <div class="chart-bar-fill danger-fill" style="width: ${occupiedPercent}%;"></div>
-                    </div>
-                    <div class="chart-value">${occupiedPercent}%</div>
-                </div>
-                <div class="chart-item">
-                    <div class="chart-label">
-                        <strong><span class="material-icons icon-inline">build</span>Mantenimiento</strong>
-                        <span>${maintenance}</span>
-                    </div>
-                    <div class="chart-bar">
-                        <div class="chart-bar-fill warning-fill" style="width: ${maintenancePercent}%;"></div>
-                    </div>
-                    <div class="chart-value">${maintenancePercent}%</div>
-                </div>
-            </div>
-        `;
+            `;
 
-        container.innerHTML = chartHTML;
+            container.innerHTML = chartHTML;
+        } catch (error) {
+            console.error('Error generando gráfico de estados:', error);
+            container.innerHTML = '<p class="text-danger">Error al cargar el gráfico</p>';
+        }
     },
 
     /**
@@ -130,34 +162,45 @@ const AnalyticsComponent = {
      */
     generateAnalyticsTable() {
         const tbody = document.getElementById('analytics-table-body');
-        if (!tbody || !ZonesComponent.zones) return;
+        if (!tbody || !this.zones || this.zones.length === 0) {
+            if (tbody) {
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No hay datos disponibles</td></tr>';
+            }
+            return;
+        }
 
-        const rows = ZonesComponent.zones.map(zone => {
-            const spaceInZone = SpacesComponent.spaces.filter(s => s.idZone === zone.id);
-            const available = spaceInZone.filter(s => s.status === 'AVAILABLE').length;
-            const occupied = spaceInZone.filter(s => s.status === 'OCCUPIED').length;
-            const maintenance = spaceInZone.filter(s => s.status === 'MAINTENANCE').length;
-            const total = spaceInZone.length;
-            const occupancyPercent = total > 0 ? Math.round((occupied / total) * 100) : 0;
+        try {
+            const rows = this.zones.map(zone => {
+                const spaceInZone = this.spaces.filter(s => s.idZone === zone.id);
+                const availableComputed = spaceInZone.filter(s => s.status === 'AVAILABLE').length;
+                const occupied = spaceInZone.filter(s => s.status === 'OCCUPIED').length;
+                const maintenance = spaceInZone.filter(s => s.status === 'MAINTENANCE').length;
+                const total = zone.capacity ?? spaceInZone.length;
+                const available = zone.availableCapacity ?? availableComputed;
+                const occupancyPercent = total > 0 ? Math.round((occupied / total) * 100) : 0;
 
-            return `
-                <tr>
-                    <td><strong>${zone.name}</strong></td>
-                    <td class="text-center">${available}</td>
-                    <td class="text-center">${occupied}</td>
-                    <td class="text-center">${maintenance}</td>
-                    <td class="text-center"><strong>${total}</strong></td>
-                    <td class="text-center">
-                        <div class="occupancy-bar">
-                            <div class="occupancy-bar-fill" style="width: ${occupancyPercent}%;"></div>
-                        </div>
-                        ${occupancyPercent}%
-                    </td>
-                </tr>
-            `;
-        });
+                return `
+                    <tr>
+                        <td><strong>${zone.name}</strong></td>
+                        <td class="text-center">${available}</td>
+                        <td class="text-center">${occupied}</td>
+                        <td class="text-center">${maintenance}</td>
+                        <td class="text-center"><strong>${total}</strong></td>
+                        <td class="text-center">
+                            <div class="occupancy-bar">
+                                <div class="occupancy-bar-fill" style="width: ${occupancyPercent}%;"></div>
+                            </div>
+                            ${occupancyPercent}%
+                        </td>
+                    </tr>
+                `;
+            });
 
-        tbody.innerHTML = rows.length > 0 ? rows.join('') : '<tr><td colspan="6" class="text-center text-muted">No hay datos disponibles</td></tr>';
+            tbody.innerHTML = rows.length > 0 ? rows.join('') : '<tr><td colspan="6" class="text-center text-muted">No hay datos disponibles</td></tr>';
+        } catch (error) {
+            console.error('Error generando tabla de analytics:', error);
+            tbody.innerHTML = '<tr><td colspan="6" class="text-center text-danger">Error al cargar la tabla</td></tr>';
+        }
     }
 };
 
@@ -245,11 +288,13 @@ const analyticsStyles = `
 `;
 
 // Inyectar estilos
-const styleSheet = document.createElement('style');
-styleSheet.textContent = analyticsStyles;
-document.head.appendChild(styleSheet);
+const analyticsStyleSheet = document.createElement('style');
+analyticsStyleSheet.textContent = analyticsStyles;
+document.head.appendChild(analyticsStyleSheet);
 
-// Inicializar cuando el DOM esté listo
+// Inicializar cuando el DOM esté listo (solo si existe analytics-section)
 document.addEventListener('DOMContentLoaded', () => {
-    AnalyticsComponent.init();
+    if (document.getElementById('analytics-section')) {
+        AnalyticsComponent.init();
+    }
 });

@@ -183,6 +183,9 @@ const SpacesComponent = {
         form.reset();
         this.editingSpaceId = spaceId;
 
+        // Actualizar dropdown de zonas
+        this.populateZoneDropdown();
+
         if (spaceId) {
             title.textContent = 'Editar Espacio';
             const space = this.spaces.find(s => s.id === spaceId);
@@ -195,6 +198,8 @@ const SpacesComponent = {
             }
         } else {
             title.textContent = 'Nuevo Espacio';
+            // Generar código automático
+            document.getElementById('space-codigo').value = this.generateCode();
         }
 
         modal.classList.remove('hidden');
@@ -288,6 +293,56 @@ const SpacesComponent = {
     },
 
     /**
+     * Poblar dropdown de zonas en modal
+     */
+    async populateZoneDropdown() {
+        const zoneSelect = document.getElementById('space-zone');
+        if (!zoneSelect) return;
+
+        try {
+            let zones;
+            // Si ZonesComponent está disponible, usar sus zonas
+            if (typeof ZonesComponent !== 'undefined' && ZonesComponent.zones && ZonesComponent.zones.length > 0) {
+                zones = ZonesComponent.zones;
+            } else {
+                // Si no, obtener las zonas del API
+                zones = await API.zones.getAllZones();
+            }
+
+            zoneSelect.innerHTML = '<option value="">Seleccionar zona...</option>' +
+                zones.map(zone => `<option value="${zone.id}">${zone.name}</option>`).join('');
+        } catch (error) {
+            console.error('Error cargando zonas para dropdown:', error);
+            zoneSelect.innerHTML = '<option value="">Error al cargar zonas</option>';
+        }
+    },
+
+    /**
+     * Generar código automático para espacio
+     */
+    generateCode() {
+        // Contar espacios existentes y generar siguiente código
+        const lastSpace = this.spaces.length > 0
+            ? this.spaces.sort((a, b) => {
+                // Extraer número del código (ej: A-001 -> 1)
+                const aNum = parseInt(a.codigo?.split('-')[1] || 0);
+                const bNum = parseInt(b.codigo?.split('-')[1] || 0);
+                return bNum - aNum;
+            })[0]
+            : null;
+
+        let nextNumber = 1;
+        if (lastSpace) {
+            const match = lastSpace.codigo?.match(/-(\d+)$/);
+            if (match) {
+                nextNumber = parseInt(match[1]) + 1;
+            }
+        }
+
+        return `A-${String(nextNumber).padStart(3, '0')}`;
+    },
+
+    /**
      * Mostrar loading
      */
     showLoading(containerId) {
@@ -321,7 +376,10 @@ const SpacesComponent = {
     }
 };
 
-// Inicializar cuando el DOM esté listo
+// Inicializar cuando el DOM esté listo (solo si estamos en la página de espacios)
 document.addEventListener('DOMContentLoaded', () => {
-    SpacesComponent.init();
+    // Solo inicializar si el elemento spaces-grid existe (página de spaces.html)
+    if (document.getElementById('spaces-grid')) {
+        SpacesComponent.init();
+    }
 });

@@ -63,6 +63,17 @@
     width: fit-content;
 }
 
+.availability-badge {
+    font-size: 0.75rem;
+    margin-top: var(--spacing-xs);
+    display: inline-block;
+    width: fit-content;
+}
+
+.availability-badge.bg-warning {
+    color: #212529;
+}
+
 .zone-actions {
     display: flex;
     gap: var(--spacing-sm);
