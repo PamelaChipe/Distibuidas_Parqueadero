@@ -5,6 +5,8 @@
 
 const API_BASE_URL = 'http://localhost:8090/api';
 
+window.API_BASE_URL = API_BASE_URL;
+
 // Configuración de headers
 const getHeaders = () => ({
     'Content-Type': 'application/json',
@@ -14,12 +16,12 @@ const getHeaders = () => ({
 // Manejo de errores
 const handleError = (error, context = '') => {
     console.error(`Error en ${context}:`, error);
-    
+
     if (error.response) {
         // Error de respuesta del servidor
         const status = error.response.status;
         const message = error.response.data?.message || 'Error del servidor';
-        
+
         if (status === 404) {
             return { error: 'Recurso no encontrado', status };
         } else if (status === 400) {

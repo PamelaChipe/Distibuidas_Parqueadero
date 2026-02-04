@@ -1,25 +1,25 @@
 {
-  "name": "parking-frontend",
-  "version": "1.0.0",
-  "description": "Frontend del Sistema de Gestión de Parqueaderos Distribuidos",
-  "author": "ESPE Universidad",
-  "license": "MIT",
-  "keywords": [
-    "parqueadero",
-    "parking",
-    "gestión",
-    "sistema distribuido",
-    "frontend"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/PamelaChipe/Distibuidas_Parqueadero"
-  },
-  "scripts": {
-    "serve": "python -m http.server 8000",
-    "serve-node": "npx http-server",
-    "dev": "npm run serve"
-  },
-  "devDependencies": {},
-  "dependencies": {}
+    "name": "parking-frontend",
+    "version": "1.0.0",
+    "description": "Frontend del Sistema de Gestión de Parqueaderos Distribuidos",
+    "author": "ESPE Universidad",
+    "license": "MIT",
+    "keywords": [
+        "parqueadero",
+        "parking",
+        "gestión",
+        "sistema distribuido",
+        "frontend"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/PamelaChipe/Distibuidas_Parqueadero"
+    },
+    "scripts": {
+        "serve": "python -m http.server 8000",
+        "serve-node": "npx http-server",
+        "dev": "npm run serve"
+    },
+    "devDependencies": {},
+    "dependencies": {}
 }

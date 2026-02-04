@@ -9,6 +9,10 @@ const AnalyticsComponent = {
      */
     init() {
         this.setupEventListeners();
+        const analyticsSection = document.getElementById('analytics-section');
+        if (analyticsSection && analyticsSection.classList.contains('active')) {
+            this.loadAnalytics();
+        }
     },
 
     /**
@@ -87,7 +91,7 @@ const AnalyticsComponent = {
             <div class="chart-content">
                 <div class="chart-item">
                     <div class="chart-label">
-                        <strong>✅ Disponibles</strong>
+                        <strong><span class="material-icons icon-inline">check_circle</span>Disponibles</strong>
                         <span>${available}</span>
                     </div>
                     <div class="chart-bar">
@@ -97,7 +101,7 @@ const AnalyticsComponent = {
                 </div>
                 <div class="chart-item">
                     <div class="chart-label">
-                        <strong>🔴 Ocupados</strong>
+                        <strong><span class="material-icons icon-inline">cancel</span>Ocupados</strong>
                         <span>${occupied}</span>
                     </div>
                     <div class="chart-bar">
@@ -107,7 +111,7 @@ const AnalyticsComponent = {
                 </div>
                 <div class="chart-item">
                     <div class="chart-label">
-                        <strong>🔧 Mantenimiento</strong>
+                        <strong><span class="material-icons icon-inline">build</span>Mantenimiento</strong>
                         <span>${maintenance}</span>
                     </div>
                     <div class="chart-bar">

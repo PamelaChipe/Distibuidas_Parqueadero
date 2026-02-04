@@ -70,7 +70,7 @@ const SpacesComponent = {
             showNotification('Error al cargar los espacios', 'error');
             document.getElementById('spaces-grid').innerHTML = `
                 <div class="empty-state">
-                    <div class="empty-state-icon">⚠️</div>
+                    <div class="empty-state-icon"><span class="material-icons">warning</span></div>
                     <p>Error al cargar los espacios. Verifique que el servidor esté ejecutándose.</p>
                 </div>
             `;
@@ -86,7 +86,7 @@ const SpacesComponent = {
         if (!spaces || spaces.length === 0) {
             container.innerHTML = `
                 <div class="empty-space" style="grid-column: 1 / -1;">
-                    <div class="empty-space-icon">🅿️</div>
+                    <div class="empty-space-icon"><span class="material-icons">local_parking</span></div>
                     <p>No hay espacios registrados o coincidentes con los filtros</p>
                 </div>
             `;
@@ -103,9 +103,9 @@ const SpacesComponent = {
     createSpaceCard(space) {
         const statusClass = space.status?.toLowerCase() || 'available';
         const statusIcons = {
-            available: '✅',
-            occupied: '🔴',
-            maintenance: '🔧'
+            available: '<span class="material-icons">check_circle</span>',
+            occupied: '<span class="material-icons">cancel</span>',
+            maintenance: '<span class="material-icons">build</span>'
         };
         const statusTexts = {
             available: 'Disponible',
@@ -121,10 +121,10 @@ const SpacesComponent = {
         ).join('');
 
         return `
-            <div class="space-card ${statusClass} ${space.isReserved ? 'reserved' : ''}">
+            <div class="space-card card shadow-sm ${statusClass} ${space.isReserved ? 'reserved' : ''}">
                 <div class="space-header">
                     <h3 class="space-codigo">${space.codigo || 'N/A'}</h3>
-                    <span class="space-badge ${statusClass}">${statusText}</span>
+                    <span class="space-badge badge ${statusClass}">${statusText}</span>
                 </div>
 
                 <div class="space-status-icon">${icon}</div>
@@ -140,14 +140,14 @@ const SpacesComponent = {
                     </div>
                     ${space.isReserved ? `
                         <div class="space-info-row">
-                            <span class="space-reserved-flag">🔒 Reservado</span>
+                            <span class="space-reserved-flag"><span class="material-icons icon-inline">lock</span>Reservado</span>
                         </div>
                     ` : ''}
                 </div>
 
                 <div class="space-card-actions">
-                    <button class="btn btn-primary btn-small" data-action="edit" data-id="${space.id}">✏️ Editar</button>
-                    <button class="btn btn-danger btn-small" data-action="delete" data-id="${space.id}">🗑️ Eliminar</button>
+                    <button class="btn btn-outline-primary btn-sm" data-action="edit" data-id="${space.id}"><span class="material-icons icon-inline">edit</span>Editar</button>
+                    <button class="btn btn-outline-danger btn-sm" data-action="delete" data-id="${space.id}"><span class="material-icons icon-inline">delete</span>Eliminar</button>
                 </div>
             </div>
         `;
@@ -301,9 +301,23 @@ const SpacesComponent = {
         const available = this.spaces.filter(s => s.status === 'AVAILABLE').length;
         const occupied = this.spaces.filter(s => s.status === 'OCCUPIED').length;
 
-        document.getElementById('total-spaces').textContent = this.spaces.length;
-        document.getElementById('available-spaces').textContent = available;
-        document.getElementById('occupied-spaces').textContent = occupied;
+        const totalSpacesEl = document.getElementById('total-spaces');
+        const availableSpacesEl = document.getElementById('available-spaces');
+        const occupiedSpacesEl = document.getElementById('occupied-spaces');
+
+        if (totalSpacesEl) {
+            totalSpacesEl.textContent = this.spaces.length;
+        }
+        if (availableSpacesEl) {
+            availableSpacesEl.textContent = available;
+        }
+        if (occupiedSpacesEl) {
+            occupiedSpacesEl.textContent = occupied;
+        }
+
+        if (typeof AnalyticsComponent !== 'undefined' && document.getElementById('analytics-section')) {
+            AnalyticsComponent.loadAnalytics();
+        }
     }
 };
 

@@ -9,6 +9,7 @@
     display: flex;
     flex-direction: column;
     gap: var(--spacing-md);
+    text-align: center;
 }
 
 /* TARJETA DE ZONA */
@@ -44,6 +45,8 @@
 .zone-title {
     display: flex;
     flex-direction: column;
+    align-items: center;
+    text-align: center;
 }
 
 .zone-name {
@@ -70,6 +73,7 @@
     font-size: 0.9rem;
     margin: var(--spacing-md) 0;
     min-height: 40px;
+    text-align: center;
 }
 
 .zone-stats {
@@ -101,7 +105,7 @@
 
 .zone-footer {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
     margin-top: var(--spacing-lg);
     padding-top: var(--spacing-lg);
@@ -135,7 +139,9 @@
 /* LISTA DE ZONAS EN DASHBOARD */
 .zone-list-item {
     display: flex;
+    flex-direction: column;
     align-items: center;
+    justify-content: center;
     padding: var(--spacing-md);
     background: white;
     border-radius: var(--radius-md);
@@ -146,11 +152,13 @@
 
 .zone-list-icon {
     font-size: 1.5rem;
-    margin-right: var(--spacing-lg);
+    margin-bottom: var(--spacing-sm);
 }
 
 .zone-list-content {
     flex: 1;
+    text-align: center;
+    width: 100%;
 }
 
 .zone-list-name {

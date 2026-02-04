@@ -63,7 +63,7 @@ const ZonesComponent = {
             showNotification('Error al cargar las zonas', 'error');
             document.getElementById('zones-grid').innerHTML = `
                 <div class="empty-state">
-                    <div class="empty-state-icon">⚠️</div>
+                    <div class="empty-state-icon"><span class="material-icons">warning</span></div>
                     <p>Error al cargar las zonas. Verifique que el servidor esté ejecutándose.</p>
                 </div>
             `;
@@ -75,11 +75,11 @@ const ZonesComponent = {
      */
     renderZones(zones = this.zones) {
         const container = document.getElementById('zones-grid');
-        
+
         if (!zones || zones.length === 0) {
             container.innerHTML = `
                 <div class="empty-state" style="grid-column: 1 / -1;">
-                    <div class="empty-state-icon">🅿️</div>
+                    <div class="empty-state-icon"><span class="material-icons">local_parking</span></div>
                     <p>No hay zonas registradas. ¡Crea la primera zona!</p>
                 </div>
             `;
@@ -95,19 +95,21 @@ const ZonesComponent = {
      */
     createZoneCard(zone) {
         const statusClass = zone.isActive ? 'zone-status-active' : 'zone-status-inactive';
-        const statusText = zone.isActive ? '✅ Activa' : '❌ Inactiva';
+        const statusText = zone.isActive
+            ? '<span class="material-icons icon-inline">check_circle</span>Activa'
+            : '<span class="material-icons icon-inline">cancel</span>Inactiva';
         const typeClass = `zone-type-${zone.type?.toLowerCase() || 'standard'}`;
 
         return `
-            <div class="zone-card">
+            <div class="zone-card card shadow-sm">
                 <div class="card-header">
                     <div class="zone-title">
                         <h3 class="zone-name">${zone.name}</h3>
-                        <span class="badge badge-info zone-type-badge ${typeClass}">${zone.type || 'N/A'}</span>
+                        <span class="badge bg-info zone-type-badge ${typeClass}">${zone.type || 'N/A'}</span>
                     </div>
                     <div class="zone-actions">
-                        <button class="btn btn-primary btn-small" data-action="edit" data-id="${zone.id}">✏️</button>
-                        <button class="btn btn-danger btn-small" data-action="delete" data-id="${zone.id}">🗑️</button>
+                        <button class="btn btn-outline-primary btn-sm" data-action="edit" data-id="${zone.id}"><span class="material-icons">edit</span></button>
+                        <button class="btn btn-outline-danger btn-sm" data-action="delete" data-id="${zone.id}"><span class="material-icons">delete</span></button>
                     </div>
                 </div>
 
@@ -125,7 +127,7 @@ const ZonesComponent = {
                 </div>
 
                 <div class="zone-footer">
-                    <span class="zone-status ${statusClass}">${statusText}</span>
+                    <span class="zone-status badge ${statusClass}">${statusText}</span>
                 </div>
             </div>
         `;
@@ -271,8 +273,15 @@ const ZonesComponent = {
      * Actualizar analytics
      */
     updateAnalytics() {
-        document.getElementById('total-zones').textContent = this.zones.length;
+        const totalZonesEl = document.getElementById('total-zones');
+        if (totalZonesEl) {
+            totalZonesEl.textContent = this.zones.length;
+        }
         this.renderZonesInDashboard();
+
+        if (typeof AnalyticsComponent !== 'undefined' && document.getElementById('analytics-section')) {
+            AnalyticsComponent.loadAnalytics();
+        }
     },
 
     /**
@@ -289,13 +298,15 @@ const ZonesComponent = {
 
         container.innerHTML = this.zones.slice(0, 3).map(zone => `
             <div class="zone-list-item">
-                <div class="zone-list-icon">🅿️</div>
+                <div class="zone-list-icon"><span class="material-icons">local_parking</span></div>
                 <div class="zone-list-content">
                     <h4 class="zone-list-name">${zone.name}</h4>
                     <p class="zone-list-info">Capacidad: ${zone.capacity} espacios</p>
                 </div>
                 <div class="zone-list-status">
-                    ${zone.isActive ? '<span style="color: #27ae60;">✓ Activa</span>' : '<span style="color: #e74c3c;">✗ Inactiva</span>'}
+                    ${zone.isActive
+                ? '<span style="color: #27ae60;"><span class="material-icons icon-inline">check_circle</span>Activa</span>'
+                : '<span style="color: #e74c3c;"><span class="material-icons icon-inline">cancel</span>Inactiva</span>'}
                 </div>
             </div>
         `).join('');

@@ -81,16 +81,16 @@ const App = {
         // Los componentes se inicializan automáticamente cuando el DOM está listo
         // Esto es solo para asegurar que se inicialicen en el orden correcto
         if (typeof ZonesComponent !== 'undefined') {
-            console.log('✓ Componente de Zonas inicializado');
+            console.log('Componente de Zonas inicializado');
         }
         if (typeof SpacesComponent !== 'undefined') {
-            console.log('✓ Componente de Espacios inicializado');
+            console.log('Componente de Espacios inicializado');
         }
         if (typeof DashboardComponent !== 'undefined') {
-            console.log('✓ Componente de Dashboard inicializado');
+            console.log('Componente de Dashboard inicializado');
         }
         if (typeof AnalyticsComponent !== 'undefined') {
-            console.log('✓ Componente de Analytics inicializado');
+            console.log('Componente de Analytics inicializado');
         }
     }
 };
@@ -119,9 +119,9 @@ function showNotification(message, type = 'info', duration = 4000) {
  * Inicializar la aplicación cuando el DOM esté listo
  */
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('🚀 Iniciando ParkingHub Frontend...');
+    console.log('Iniciando ParkingHub Frontend...');
     App.init();
-    console.log('✅ ParkingHub Frontend iniciado correctamente');
+    console.log('ParkingHub Frontend iniciado correctamente');
 });
 
 // Agregar animación de salida para notificaciones

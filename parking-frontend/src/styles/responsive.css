@@ -193,7 +193,7 @@
         padding: var(--spacing-md);
     }
 
-    .modal-content > :not(.modal-header) {
+    .modal-content> :not(.modal-header) {
         padding: var(--spacing-md);
     }
 
@@ -210,7 +210,8 @@
     .form-group textarea,
     .form-group select {
         padding: var(--spacing-sm);
-        font-size: 16px; /* Previene zoom en iOS */
+        font-size: 16px;
+        /* Previene zoom en iOS */
     }
 
     .form-group label {
@@ -271,11 +272,11 @@
 
     /* FOOTER */
     .footer {
-        padding: var(--spacing-xl) 0;
+        padding: var(--spacing-sm) 0;
     }
 
     .footer p {
-        font-size: 0.8rem;
+        font-size: 0.7rem;
     }
 
     /* NOTIFICATIONS */
@@ -332,6 +333,7 @@
 
 /* IMPRESIÓN */
 @media print {
+
     .header,
     .footer,
     .section-controls,
